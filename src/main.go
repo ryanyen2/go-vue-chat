@@ -26,7 +26,7 @@ type Message struct {
 
 func main() {
 	// create a simple file server
-	fs := http.FileServer(http.Dir("../public/vue-chat/dist"))
+	fs := http.FileServer(http.Dir("C:\\Users\\ryanm\\GolandProjects\\go-vue-chat\\public\\vue-chat\\dist"))
 	http.Handle("/", fs)
 
 	// configure websocket route
@@ -34,8 +34,8 @@ func main() {
 	go handleMessages()
 
 	// start the server on localhost port 8000 and log any errors
-	log.Println("http server started on :8000")
-	err := http.ListenAndServe(":8000", nil)
+	log.Println("http server started on :8010")
+	err := http.ListenAndServe(":8010", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
@@ -49,7 +49,12 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// make sure we close the connection when the function returns
-	defer ws.Close()
+	defer func(ws *websocket.Conn) {
+		err := ws.Close()
+		if err != nil {
+
+		}
+	}(ws)
 
 	// register our new client
 	clients[ws] = true

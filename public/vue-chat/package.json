@@ -12,7 +12,10 @@
     "crypto-js": "^4.0.0",
     "emojione": "^4.5.0",
     "materialize-css": "^1.0.0-rc.2",
+    "rxjs": "^6.6.7",
+    "speech-to-text": "^2.9.1",
     "vue": "^2.6.11",
+    "vue-beautiful-chat": "^2.5.0",
     "vuetify": "^2.4.0"
   },
   "devDependencies": {

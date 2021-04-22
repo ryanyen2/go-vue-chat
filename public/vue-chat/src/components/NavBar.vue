@@ -34,28 +34,26 @@
       <v-btn icon>
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
-
-      <template v-slot:extension>
-        <v-tabs align-with-title>
-          <v-tab>Tab 1</v-tab>
-          <v-tab>Tab 2</v-tab>
-          <v-tab>Tab 3</v-tab>
-        </v-tabs>
-      </template>
     </v-app-bar>
     <v-sheet
         id="scrolling-techniques-3"
         class="overflow-y-auto"
-        max-height="600"
+        max-height="1000"
     >
-      <v-container style="height: 1000px;"></v-container>
+      <v-container style="margin-top: 10rem;">
+        <Chat />
+      </v-container>
     </v-sheet>
   </v-card>
 </template>
 
 <script>
+import Chat from './ChatBody';
 export default {
-  name: "NavBar"
+  name: "NavBar",
+  components: {
+    Chat,
+  }
 }
 </script>
 
