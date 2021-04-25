@@ -2,6 +2,7 @@ package main
 
 import (
 	"cloud.google.com/go/firestore"
+	"context"
 	firebase "firebase.google.com/go"
 	"google.golang.org/api/option"
 	"log"
@@ -12,6 +13,8 @@ import (
 
 var clients = make(map[*websocket.Conn]bool) // connected clients
 var broadcast = make(chan Message)           // broadcast channel
+var fireStoreClient *firestore.Client
+var ctx = context.Background()
 
 // configure the upgrader
 var upgrader = websocket.Upgrader{
@@ -51,19 +54,29 @@ func main() {
 		log.Fatal("ListenAndServe: ", err)
 	}
 
+	// setup firestore from firebase app
 	sa := option.WithCredentialsFile("./credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
-	app, err := firebase.NewApp(context.Background(), nil, sa)
+	app, err := firebase.NewApp(ctx, nil, sa)
 
-	client, err := app.Firestore(context.Background())
+	fireStoreClient, err = app.Firestore(ctx)
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	defer func(client *firestore.Client) {
 		err := client.Close()
 		if err != nil {
 
 		}
-	}(client)
+	}(fireStoreClient)
+}
+
+func storeDataToFirebase(ctx context.Context, client *firestore.Client, message Message) {
+	result, err := client.Collection("audio-context").Doc("contentHistory").Set(ctx, message)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Println(result)
 }
 
 func handleConnections(w http.ResponseWriter, r *http.Request) {
@@ -95,6 +108,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
+		storeDataToFirebase(ctx, fireStoreClient, msg)
 		log.Printf("Message: %v", msg)
 		// Send the newly received message to the broadcast channel
 		broadcast <- msg
