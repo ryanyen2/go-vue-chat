@@ -4,9 +4,11 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	firebase "firebase.google.com/go"
+	"fmt"
 	"google.golang.org/api/option"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -39,6 +41,20 @@ type User struct {
 }
 
 func main() {
+	// setup firestore from firebase app
+	sa := option.WithCredentialsFile("C:\\Users\\ryanm\\GolandProjects\\go-vue-chat\\src\\credentials\\wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
+	app, err := firebase.NewApp(ctx, nil, sa)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fireStoreClient, err = app.Firestore(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer fireStoreClient.Close()
+	fmt.Println("firebase app is initialized.")
+
 	// create a simple file server
 	fs := http.FileServer(http.Dir("C:\\Users\\ryanm\\GolandProjects\\go-vue-chat\\public\\vue-chat\\dist"))
 	http.Handle("/", fs)
@@ -49,30 +65,15 @@ func main() {
 
 	// start the server on localhost port 8000 and log any errors
 	log.Println("http server started on :8010")
-	err := http.ListenAndServe(":8010", nil)
+	err = http.ListenAndServe(":8010", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-
-	// setup firestore from firebase app
-	sa := option.WithCredentialsFile("./credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
-	app, err := firebase.NewApp(ctx, nil, sa)
-
-	fireStoreClient, err = app.Firestore(ctx)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	defer func(client *firestore.Client) {
-		err := client.Close()
-		if err != nil {
-
-		}
-	}(fireStoreClient)
 }
 
-func storeDataToFirebase(ctx context.Context, client *firestore.Client, message Message) {
-	result, err := client.Collection("audio-context").Doc("contentHistory").Set(ctx, message)
+func storeDataToFirebase(message Message) {
+	documentName := fmt.Sprintf("content - %d", time.Now().Unix())
+	result, err := fireStoreClient.Collection("audio-context").Doc(documentName).Set(ctx, message)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -108,7 +109,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		storeDataToFirebase(ctx, fireStoreClient, msg)
+		storeDataToFirebase(msg)
 		log.Printf("Message: %v", msg)
 		// Send the newly received message to the broadcast channel
 		broadcast <- msg
