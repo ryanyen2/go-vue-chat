@@ -1,6 +1,9 @@
 package main
 
 import (
+	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go"
+	"google.golang.org/api/option"
 	"log"
 	"net/http"
 
@@ -17,11 +20,19 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// define our message object
+// Message define our message object
 type Message struct {
-	Email    string `json:"email"`
+	Type string `json:"type"`
 	Username string `json:"username"`
 	Message  string `json:"message"`
+	Timestamp string `json:"timestamp"`
+}
+
+type User struct {
+	Email string `json:"email"`
+	Username string `json:"username"`
+	Role string `json:"role"`
+	CreatedAt string `json:"createdAt"`
 }
 
 func main() {
@@ -39,6 +50,20 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+
+	sa := option.WithCredentialsFile("./credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
+	app, err := firebase.NewApp(context.Background(), nil, sa)
+
+	client, err := app.Firestore(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer func(client *firestore.Client) {
+		err := client.Close()
+		if err != nil {
+
+		}
+	}(client)
 }
 
 func handleConnections(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +95,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
+		log.Printf("Message: %v", msg)
 		// Send the newly received message to the broadcast channel
 		broadcast <- msg
 	}
