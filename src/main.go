@@ -42,7 +42,7 @@ type User struct {
 
 func main() {
 	// setup firestore from firebase app
-	sa := option.WithCredentialsFile("C:\\Users\\ryanm\\GolandProjects\\go-vue-chat\\src\\credentials\\wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
+	sa := option.WithCredentialsFile("./src/credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		log.Fatalln(err)
@@ -56,7 +56,7 @@ func main() {
 	fmt.Println("firebase app is initialized.")
 
 	// create a simple file server
-	fs := http.FileServer(http.Dir("C:\\Users\\ryanm\\GolandProjects\\go-vue-chat\\public\\vue-chat\\dist"))
+	fs := http.FileServer(http.Dir("./public/vue-chat/dist"))
 	http.Handle("/", fs)
 
 	// configure websocket route
