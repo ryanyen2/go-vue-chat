@@ -3,7 +3,7 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"context"
-	firebase "firebase.google.com/go"
+	firebase "firebase.google.com/go/v4"
 	"fmt"
 	"google.golang.org/api/option"
 	"log"
@@ -42,7 +42,7 @@ type User struct {
 
 func main() {
 	// setup firestore from firebase app
-	sa := option.WithCredentialsFile("./src/credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
+	sa := option.WithCredentialsFile("./credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		log.Fatalln(err)
@@ -56,7 +56,7 @@ func main() {
 	fmt.Println("firebase app is initialized.")
 
 	// create a simple file server
-	fs := http.FileServer(http.Dir("./public/vue-chat/dist"))
+	fs := http.FileServer(http.Dir("./dist"))
 	http.Handle("/", fs)
 
 	// configure websocket route
@@ -64,8 +64,8 @@ func main() {
 	go handleMessages()
 
 	// start the server on localhost port 8000 and log any errors
-	log.Println("http server started on :8010")
-	err = http.ListenAndServe(":8010", nil)
+	log.Println("http server started on :8080")
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
