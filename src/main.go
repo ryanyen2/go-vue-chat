@@ -41,6 +41,7 @@ type User struct {
 }
 
 func main() {
+
 	// setup firestore from firebase app
 	sa := option.WithCredentialsFile("./credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
@@ -56,7 +57,7 @@ func main() {
 	fmt.Println("firebase app is initialized.")
 
 	// create a simple file server
-	fs := http.FileServer(http.Dir("./dist"))
+	fs := http.FileServer(http.Dir("./front-dist"))
 	http.Handle("/", fs)
 
 	// configure websocket route
