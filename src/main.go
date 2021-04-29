@@ -61,12 +61,12 @@ func main() {
 	http.Handle("/", fs)
 
 	// configure websocket route
-	http.HandleFunc("/ws", handleConnections)
+	http.HandleFunc("/wss", handleConnections)
 	go handleMessages()
 
 	// start the server on localhost port 8000 and log any errors
 	log.Println("http server started on :8080")
-	err = http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServeTLS(":8080", "./credentials/cert.pem", "./credentials/key.pem", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
