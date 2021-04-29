@@ -121,7 +121,7 @@ export default {
     }
   },
   mounted() {
-    this.ws = new WebSocket("wss://" + window.location.host + "/wss");
+    this.ws = new WebSocket("ws://" + window.location.host + "/ws");
     this.ws.addEventListener("message", e => {
       let msg = JSON.parse(e.data);
       // console.log("Message", msg)

@@ -1,14 +1,15 @@
 package main
 
 import (
-	"cloud.google.com/go/firestore"
 	"context"
-	firebase "firebase.google.com/go/v4"
 	"fmt"
-	"google.golang.org/api/option"
 	"log"
 	"net/http"
 	"time"
+
+	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go/v4"
+	"google.golang.org/api/option"
 
 	"github.com/gorilla/websocket"
 )
@@ -27,23 +28,23 @@ var upgrader = websocket.Upgrader{
 
 // Message define our message object
 type Message struct {
-	Type string `json:"type"`
-	Username string `json:"username"`
-	Message  string `json:"message"`
+	Type      string `json:"type"`
+	Username  string `json:"username"`
+	Message   string `json:"message"`
 	Timestamp string `json:"timestamp"`
 }
 
 type User struct {
-	Email string `json:"email"`
-	Username string `json:"username"`
-	Role string `json:"role"`
+	Email     string `json:"email"`
+	Username  string `json:"username"`
+	Role      string `json:"role"`
 	CreatedAt string `json:"createdAt"`
 }
 
 func main() {
 
 	// setup firestore from firebase app
-	sa := option.WithCredentialsFile("./credentials/wizardofoz-b2c61-firebase-adminsdk-hi62x-7bc9782fc7.json")
+	sa := option.WithCredentialsFile("./credentials/wizardofoz.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		log.Fatalln(err)
@@ -61,12 +62,12 @@ func main() {
 	http.Handle("/", fs)
 
 	// configure websocket route
-	http.HandleFunc("/wss", handleConnections)
+	http.HandleFunc("/ws", handleConnections)
 	go handleMessages()
 
 	// start the server on localhost port 8000 and log any errors
 	log.Println("http server started on :8080")
-	err = http.ListenAndServeTLS(":8080", "./credentials/cert.pem", "./credentials/key.pem", nil)
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
