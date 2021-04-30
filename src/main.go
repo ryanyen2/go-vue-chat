@@ -66,11 +66,11 @@ func main() {
 	go handleMessages()
 
 	// start the server on localhost port 8000 and log any errors
-	log.Println("http server started on :8080")
+	log.Println("https server started on :8080")
 	err = http.ListenAndServeTLS(":8080", "/etc/letsencrypt/live/ryanyen2.me/fullchain.pem", "/etc/letsencrypt/live/ryanyen2.me/privkey.pem", nil)
 	// err = http.ListenAndServe(":8080", nil)
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		log.Fatal("ListenAndServeTLS: ", err)
 	}
 }
 

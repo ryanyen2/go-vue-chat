@@ -204,7 +204,7 @@ export default {
     this.recognition.interimResults = true;
     this.recognition.lang = "en-US";
 
-    this.ws = new WebSocket("ws://" + window.location.host + "/ws");
+    this.ws = new WebSocket("wss://" + window.location.host + "/wss");
     this.ws.addEventListener("message", e => {
       let msg = JSON.parse(e.data);
       if (msg.type === 'modification') {
