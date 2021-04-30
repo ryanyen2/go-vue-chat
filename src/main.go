@@ -44,7 +44,7 @@ type User struct {
 func main() {
 
 	// setup firestore from firebase app
-	sa := option.WithCredentialsFile("./credentials/wizardofoz.json")
+	sa := option.WithCredentialsFile("/root/go-vue-chat/src/credentials/wizardofoz.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		log.Fatalln(err)
@@ -58,7 +58,7 @@ func main() {
 	fmt.Println("firebase app is initialized.")
 
 	// create a simple file server
-	fs := http.FileServer(http.Dir("./front-dist"))
+	fs := http.FileServer(http.Dir("/root/go-vue-chat/src/front-dist"))
 	http.Handle("/", fs)
 
 	// configure websocket route
@@ -67,6 +67,7 @@ func main() {
 
 	// start the server on localhost port 8000 and log any errors
 	log.Println("http server started on :8080")
+	// err = http.ListenAndServeTLS(":8080", "/etc/letsencrypt/live/ryanyen2.me/fullchain.pem", "/etc/letsencrypt/live/ryanyen2.me/privkey.pem", nil)
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
