@@ -62,7 +62,7 @@ func main() {
 	http.Handle("/", fs)
 
 	// configure websocket route
-	http.HandleFunc("/ws", handleConnections)
+	http.HandleFunc("/wss", handleConnections)
 	go handleMessages()
 
 	// start the server on localhost port 8000 and log any errors
