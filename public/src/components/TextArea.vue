@@ -27,9 +27,6 @@
       />
     </div>
     <div class="text-area" v-else>
-      <!--      <div class="output ql-snow">-->
-      <!--        <div class="ql-editor" v-html="content"></div>-->
-      <!--      </div>-->
       <quill-editor
           class="editor"
           ref="myBubbleEditor"
@@ -113,18 +110,16 @@ export default {
   },
   watch: {
     sentences(newSentences) {
-      console.log(newSentences)
-      this.content += newSentences[newSentences.length - 1].content
+      let ns = newSentences[newSentences.length - 1].content
+      if (!this.content) this.content += ns
+      else this.content = this.content.replace(/<\/p>/g, ` ${ns}</p>`);
+      console.log(this.content)
     }
   },
   methods: {
     onEditorChange: debounce(function (value) {
-      this.content = value.html
-      this.content = this.content.replace(/<p>/g, ' ');
-      this.content = this.content.replace(/<\/p>/g, ' ');
-      this.content = '<p>' + this.content + '</p>'
-
-      console.log(this.content)
+      console.log(value)
+      this.preProcessContent(value.html);
     }, 466),
     wizardAddComment(){
       this.ws.send(
@@ -165,7 +160,7 @@ export default {
                 timestamp: dayjs()
               })
           )
-          // this.content += this.runTimeContent
+          if (process.env.NODE_ENV === 'development') this.content += this.runTimeContent
           this.runTimeContent = ""
         }
         this.recognition.stop()
@@ -178,12 +173,14 @@ export default {
       this.isTesting = false
       this.recognition.stop()
     },
-    preProcessContent() {
+    async preProcessContent(htmlVal) {
       // TODO: PUNCTUATION
-      // let headers = { 'Access-Control-Allow-Origin': '*' }
-      // this.$http.post('http://bark.phon.ioc.ee/punctuator',
-      //     { "text": this.content }, {headers})
-      //     .then(res => this.content = res.data)
+      if (process.env.NODE_ENV === 'production') {
+         let headers = { 'Access-Control-Allow-Origin': '*' }
+        await this.$http.post('http://bark.phon.ioc.ee/punctuator',
+          { "text": htmlVal }, {headers})
+          .then(res => this.content = res.data)
+      }
     }
   },
   computed: {
@@ -199,12 +196,13 @@ export default {
     }
   },
   mounted() {
+    console.log(process.env)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     this.recognition = new SpeechRecognition();
     this.recognition.interimResults = true;
     this.recognition.lang = "en-US";
 
-    this.ws = new WebSocket("wss://" + window.location.host + "/wss");
+    this.ws = new WebSocket("ws://" + window.location.host + "/ws");
     this.ws.addEventListener("message", e => {
       let msg = JSON.parse(e.data);
       if (msg.type === 'modification') {
